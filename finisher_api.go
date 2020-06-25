@@ -302,7 +302,7 @@ func (db *DB) Rows() (*sql.Rows, error) {
 	return tx.Statement.Dest.(*sql.Rows), tx.Error
 }
 
-// Scan scan value to a struct
+// Scan scan value to a struct 返回到 &struct 变量的指针
 func (db *DB) Scan(dest interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Dest = dest

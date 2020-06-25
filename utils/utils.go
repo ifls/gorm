@@ -18,6 +18,7 @@ func init() {
 	gormSourceDir = regexp.MustCompile("utils.utils\\.go").ReplaceAllString(file, "")
 }
 
+//文件:行号
 func FileWithLineNum() string {
 	for i := 2; i < 15; i++ {
 		_, file, line, ok := runtime.Caller(i)

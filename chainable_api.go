@@ -41,6 +41,7 @@ func (db *DB) Clauses(conds ...clause.Expression) (tx *DB) {
 }
 
 // Table specify the table you would like to run db operations
+// 设置表明 到 Statement 结构体里
 func (db *DB) Table(name string) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Table = name
@@ -48,6 +49,7 @@ func (db *DB) Table(name string) (tx *DB) {
 }
 
 // Distinct specify distinct fields that you want querying
+// 指定select 哪些字段 是 distinct
 func (db *DB) Distinct(args ...interface{}) (tx *DB) {
 	tx = db
 	if len(args) > 0 {
@@ -58,6 +60,7 @@ func (db *DB) Distinct(args ...interface{}) (tx *DB) {
 }
 
 // Select specify fields that you want when querying, creating, updating
+// 指定 需要操作的字段
 func (db *DB) Select(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 
@@ -109,6 +112,7 @@ func (db *DB) Select(query interface{}, args ...interface{}) (tx *DB) {
 }
 
 // Omit specify fields that you want to ignore when creating, updating and querying
+// 指定需要忽略的字段
 func (db *DB) Omit(columns ...string) (tx *DB) {
 	tx = db.getInstance()
 
@@ -121,6 +125,7 @@ func (db *DB) Omit(columns ...string) (tx *DB) {
 }
 
 // Where add conditions
+// 添加 过滤条件
 func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
@@ -130,6 +135,7 @@ func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 }
 
 // Not add NOT conditions
+// 反向 过滤条件
 func (db *DB) Not(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
@@ -139,6 +145,7 @@ func (db *DB) Not(query interface{}, args ...interface{}) (tx *DB) {
 }
 
 // Or add OR conditions
+// 条件里的或
 func (db *DB) Or(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {

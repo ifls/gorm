@@ -17,15 +17,15 @@ import (
 // Statement statement
 type Statement struct {
 	*DB
-	Table                string
+	Table                string			//表明
 	Model                interface{}
 	Unscoped             bool
 	Dest                 interface{}
 	ReflectValue         reflect.Value
 	Clauses              map[string]clause.Clause
 	Distinct             bool
-	Selects              []string // selected columns
-	Omits                []string // omit columns
+	Selects              []string // selected columns 被 select 的字段名
+	Omits                []string // omit columns  要被排除掉的字段名
 	Joins                map[string][]interface{}
 	Preloads             map[string][]interface{}
 	Settings             sync.Map
@@ -221,6 +221,7 @@ func (stmt *Statement) AddClauseIfNotExists(v clause.Interface) {
 }
 
 // BuildCondition build condition
+// 负责 生成 where 语句
 func (stmt *Statement) BuildCondition(query interface{}, args ...interface{}) (conds []clause.Expression) {
 	if sql, ok := query.(string); ok {
 		// if it is a number, then treats it as primary key

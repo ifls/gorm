@@ -1,6 +1,6 @@
 package clause
 
-// Interface clause interface
+// Interface clause子句 interface
 type Interface interface {
 	Name() string
 	Build(Builder)
