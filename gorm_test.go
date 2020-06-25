@@ -2,8 +2,8 @@ package gorm_test
 
 import (
 	"database/sql"
-	"github.com/jinzhu/gorm"
-	_ "github.com/jinzhu/gorm/dialects/mysql"
+	"github.com/go-gorm/gorm"
+	_ "github.com/go-sql-driver/mysql"
 	"log"
 	"testing"
 )
@@ -37,6 +37,7 @@ func TestGorm(t *testing.T) {
 	db.Model(&product).Update("Price", 2000)
 	printStats(db)
 
+	//db.Exec()
 	// 删除 - 删除product
 	//db.Delete(&product)
 }
@@ -48,4 +49,6 @@ func printStats(db *gorm.DB)  {
 		st := d.Stats()
 		log.Printf("%#v\n", st)
 	}
+
+	log.Printf("-->%#v\n", db.DB().Stats())
 }

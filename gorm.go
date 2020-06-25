@@ -36,7 +36,7 @@ type Config struct {
 	// ClauseBuilders clause builder
 	ClauseBuilders map[string]clause.ClauseBuilder
 	// ConnPool db conn pool
-	ConnPool ConnPool
+	ConnPool ConnPool		//可能就是 *sql.DB, 也可能是一个 struct 里面内嵌 *sql.DB
 	// Dialector database dialector
 	Dialector
 	// Plugins registered plugins
@@ -136,6 +136,7 @@ func Open(dialector Dialector, config *Config) (db *DB, err error) {
 }
 
 // Session create new db session
+// session 也就是一些配置
 func (db *DB) Session(config *Session) *DB {
 	var (
 		txConfig = *db.Config
@@ -191,8 +192,9 @@ func (db *DB) Debug() (tx *DB) {
 	})
 }
 
-// Set store value with key into current db instance's context
+// Set -> store value with key into current db instance's context
 func (db *DB) Set(key string, value interface{}) *DB {
+	//可能就是同一个对象
 	tx := db.getInstance()
 	tx.Statement.Settings.Store(key, value)
 	return tx
@@ -234,7 +236,7 @@ func (db *DB) AddError(err error) error {
 }
 
 // DB returns `*sql.DB`
-// 返回内部的连接池
+// 返回内部的连接池 一般是 *sql.DB 定义的原始通用接口
 func (db *DB) DB() (*sql.DB, error) {
 	connPool := db.ConnPool
 
@@ -278,6 +280,7 @@ func Expr(expr string, args ...interface{}) clause.Expr {
 	return clause.Expr{SQL: expr, Vars: args}
 }
 
+// 表连接
 func (db *DB) SetupJoinTable(model interface{}, field string, joinTable interface{}) error {
 	var (
 		tx                      = db.getInstance()

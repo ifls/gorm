@@ -18,6 +18,7 @@ type Association struct {
 	Error        error
 }
 
+// 关联 不知道怎么用
 func (db *DB) Association(column string) *Association {
 	association := &Association{DB: db}
 	table := db.Statement.Table

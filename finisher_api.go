@@ -1,3 +1,5 @@
+//结束 api 立即执行 api
+
 package gorm
 
 import (
@@ -10,7 +12,8 @@ import (
 	"gorm.io/gorm/clause"
 )
 
-// Create insert the value into database
+// Create -> insert the value into database
+// 插入
 func (db *DB) Create(value interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Dest = value
@@ -19,6 +22,7 @@ func (db *DB) Create(value interface{}) (tx *DB) {
 }
 
 // Save update value in database, if the value doesn't have primary key, will insert it
+// update or insert
 func (db *DB) Save(value interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Dest = value
@@ -33,6 +37,7 @@ func (db *DB) Save(value interface{}) (tx *DB) {
 			where := clause.Where{Exprs: make([]clause.Expression, len(tx.Statement.Schema.PrimaryFields))}
 			for idx, pf := range tx.Statement.Schema.PrimaryFields {
 				if pv, isZero := pf.ValueOf(reflectValue); isZero {
+					//insert
 					tx.callbacks.Create().Execute(tx)
 					return
 				} else {
@@ -48,7 +53,7 @@ func (db *DB) Save(value interface{}) (tx *DB) {
 		if len(tx.Statement.Selects) == 0 {
 			tx.Statement.Selects = append(tx.Statement.Selects, "*")
 		}
-
+		// update
 		tx.callbacks.Update().Execute(tx)
 	}
 
@@ -56,6 +61,7 @@ func (db *DB) Save(value interface{}) (tx *DB) {
 }
 
 // First find first record that match given conditions, order by primary key
+// 拿第一行
 func (db *DB) First(dest interface{}, conds ...interface{}) (tx *DB) {
 	tx = db.Limit(1).Order(clause.OrderByColumn{
 		Column: clause.Column{Table: clause.CurrentTable, Name: clause.PrimaryKey},
@@ -70,6 +76,7 @@ func (db *DB) First(dest interface{}, conds ...interface{}) (tx *DB) {
 }
 
 // Take return a record that match given conditions, the order will depend on the database implementation
+// 拿一行 就是 LIMIT 1
 func (db *DB) Take(dest interface{}, conds ...interface{}) (tx *DB) {
 	tx = db.Limit(1)
 	if len(conds) > 0 {
@@ -82,6 +89,7 @@ func (db *DB) Take(dest interface{}, conds ...interface{}) (tx *DB) {
 }
 
 // Last find last record that match given conditions, order by primary key
+// 逆序第一个
 func (db *DB) Last(dest interface{}, conds ...interface{}) (tx *DB) {
 	tx = db.Limit(1).Order(clause.OrderByColumn{
 		Column: clause.Column{Table: clause.CurrentTable, Name: clause.PrimaryKey},
@@ -97,6 +105,7 @@ func (db *DB) Last(dest interface{}, conds ...interface{}) (tx *DB) {
 }
 
 // Find find records that match given conditions
+// 返回 多行
 func (db *DB) Find(dest interface{}, conds ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if len(conds) > 0 {
@@ -108,6 +117,7 @@ func (db *DB) Find(dest interface{}, conds ...interface{}) (tx *DB) {
 }
 
 // FindInBatches find records in batches
+// 一批一批返回
 func (db *DB) FindInBatches(dest interface{}, batchSize int, fc func(tx *DB, batch int) error) (tx *DB) {
 	tx = db.Session(&Session{WithConditions: true})
 	rowsAffected := int64(0)
@@ -149,6 +159,7 @@ func (tx *DB) assignExprsToValue(exprs []clause.Expression) {
 	}
 }
 
+//找不到则用默认值 填充
 func (db *DB) FirstOrInit(dest interface{}, conds ...interface{}) (tx *DB) {
 	if tx = db.First(dest, conds...); errors.Is(tx.Error, ErrRecordNotFound) {
 		if c, ok := tx.Statement.Clauses["WHERE"]; ok {
@@ -173,6 +184,7 @@ func (db *DB) FirstOrInit(dest interface{}, conds ...interface{}) (tx *DB) {
 	return
 }
 
+// 找不到就插入或者更新
 func (db *DB) FirstOrCreate(dest interface{}, conds ...interface{}) (tx *DB) {
 	if tx = db.First(dest, conds...); errors.Is(tx.Error, ErrRecordNotFound) {
 		tx.Error = nil
@@ -260,6 +272,7 @@ func (db *DB) Delete(value interface{}, conds ...interface{}) (tx *DB) {
 	return
 }
 
+//查询数量
 func (db *DB) Count(count *int64) (tx *DB) {
 	tx = db.getInstance()
 	if tx.Statement.Model == nil {
@@ -303,6 +316,7 @@ func (db *DB) Rows() (*sql.Rows, error) {
 }
 
 // Scan scan value to a struct 返回到 &struct 变量的指针
+// 查询
 func (db *DB) Scan(dest interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Dest = dest
@@ -344,6 +358,7 @@ func (db *DB) ScanRows(rows *sql.Rows, dest interface{}) error {
 }
 
 // Transaction start a transaction as a block, return error will rollback, otherwise to commit.
+// 封装事务逻辑,
 func (db *DB) Transaction(fc func(tx *DB) error, opts ...*sql.TxOptions) (err error) {
 	panicked := true
 
@@ -446,6 +461,7 @@ func (db *DB) RollbackTo(name string) *DB {
 }
 
 // Exec execute raw sql
+// 执行原始 sql 语句
 func (db *DB) Exec(sql string, values ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.SQL = strings.Builder{}

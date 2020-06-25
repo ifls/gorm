@@ -17,18 +17,18 @@ import (
 // Statement statement
 type Statement struct {
 	*DB
-	Table                string			//表明
+	Table                string			//表名
 	Model                interface{}
 	Unscoped             bool
-	Dest                 interface{}
+	Dest                 interface{}	//返回结果存放点
 	ReflectValue         reflect.Value
-	Clauses              map[string]clause.Clause
-	Distinct             bool
+	Clauses              map[string]clause.Clause	//子句
+	Distinct             bool		//标记 去重
 	Selects              []string // selected columns 被 select 的字段名
 	Omits                []string // omit columns  要被排除掉的字段名
-	Joins                map[string][]interface{}
-	Preloads             map[string][]interface{}
-	Settings             sync.Map
+	Joins                map[string][]interface{}	//记录 连表查询
+	Preloads             map[string][]interface{}	//不知道
+	Settings             sync.Map		//保存设置的一些 kv
 	ConnPool             ConnPool
 	Schema               *schema.Schema
 	Context              context.Context
@@ -37,8 +37,8 @@ type Statement struct {
 	SQL                  strings.Builder
 	Vars                 []interface{}
 	NamedVars            []sql.NamedArg
-	attrs                []interface{}
-	assigns              []interface{}
+	attrs                []interface{}		//属性
+	assigns              []interface{}		//属性
 }
 
 // StatementModifier statement modifier interface

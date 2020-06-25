@@ -13,6 +13,7 @@ func (db *DB) Migrator() Migrator {
 }
 
 // AutoMigrate run auto migration for given models
+// 自动升级表结构, 不删,不改原来的字段
 func (db *DB) AutoMigrate(dst ...interface{}) error {
 	return db.Migrator().AutoMigrate(dst...)
 }
