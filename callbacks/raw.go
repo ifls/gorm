@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// 处理函数
 func RawExec(db *gorm.DB) {
 	if db.Error == nil {
 		result, err := db.Statement.ConnPool.ExecContext(db.Statement.Context, db.Statement.SQL.String(), db.Statement.Vars...)

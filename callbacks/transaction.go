@@ -3,7 +3,7 @@ package callbacks
 import (
 	"gorm.io/gorm"
 )
-
+// 处理函数
 func BeginTransaction(db *gorm.DB) {
 	if tx := db.Begin(); tx.Error == nil {
 		db.Statement.ConnPool = tx.Statement.ConnPool
@@ -12,7 +12,7 @@ func BeginTransaction(db *gorm.DB) {
 		tx.Error = nil
 	}
 }
-
+// 处理函数
 func CommitOrRollbackTransaction(db *gorm.DB) {
 	if _, ok := db.InstanceGet("gorm:started_transaction"); ok {
 		if db.Error == nil {

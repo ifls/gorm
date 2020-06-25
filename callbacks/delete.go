@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 )
-
+// 处理函数
 func BeforeDelete(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && db.Statement.Schema.BeforeDelete {
 		callMethod(db, func(value interface{}, tx *gorm.DB) bool {
@@ -20,7 +20,7 @@ func BeforeDelete(db *gorm.DB) {
 		})
 	}
 }
-
+// 处理函数
 func Delete(db *gorm.DB) {
 	if db.Error == nil {
 		if db.Statement.Schema != nil && !db.Statement.Unscoped {
@@ -71,7 +71,7 @@ func Delete(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func AfterDelete(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && db.Statement.Schema.AfterDelete {
 		callMethod(db, func(value interface{}, tx *gorm.DB) bool {

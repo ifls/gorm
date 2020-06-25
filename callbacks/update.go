@@ -8,7 +8,7 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 )
-
+// 处理函数
 func SetupUpdateReflectValue(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil {
 		if !db.Statement.ReflectValue.CanAddr() || db.Statement.Model != db.Statement.Dest {
@@ -27,7 +27,7 @@ func SetupUpdateReflectValue(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func BeforeUpdate(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && !db.Statement.UpdatingColumn && (db.Statement.Schema.BeforeSave || db.Statement.Schema.BeforeUpdate) {
 		callMethod(db, func(value interface{}, tx *gorm.DB) (called bool) {
@@ -49,7 +49,7 @@ func BeforeUpdate(db *gorm.DB) {
 		})
 	}
 }
-
+// 处理函数
 func Update(db *gorm.DB) {
 	if db.Error == nil {
 		if db.Statement.Schema != nil && !db.Statement.Unscoped {
@@ -85,7 +85,7 @@ func Update(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func AfterUpdate(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && !db.Statement.UpdatingColumn && (db.Statement.Schema.AfterSave || db.Statement.Schema.AfterUpdate) {
 		callMethod(db, func(value interface{}, tx *gorm.DB) (called bool) {

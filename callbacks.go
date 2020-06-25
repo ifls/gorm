@@ -96,6 +96,7 @@ func (p *processor) Execute(db *DB) {
 		}
 	}
 
+	//实际处理函数是在这里
 	for _, f := range p.fns {
 		f(db)
 	}

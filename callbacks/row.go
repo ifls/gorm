@@ -4,6 +4,7 @@ import (
 	"gorm.io/gorm"
 )
 
+// query 处理函数
 func RowQuery(db *gorm.DB) {
 	if db.Error == nil {
 		if db.Statement.SQL.String() == "" {

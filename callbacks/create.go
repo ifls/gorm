@@ -7,7 +7,7 @@ import (
 	"gorm.io/gorm/clause"
 	"gorm.io/gorm/schema"
 )
-
+// 处理函数
 func BeforeCreate(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && (db.Statement.Schema.BeforeSave || db.Statement.Schema.BeforeCreate) {
 		callMethod(db, func(value interface{}, tx *gorm.DB) (called bool) {
@@ -28,7 +28,7 @@ func BeforeCreate(db *gorm.DB) {
 		})
 	}
 }
-
+// 处理函数
 func Create(config *Config) func(db *gorm.DB) {
 	if config.WithReturning {
 		return CreateWithReturning
@@ -101,7 +101,7 @@ func Create(config *Config) func(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func CreateWithReturning(db *gorm.DB) {
 	if db.Error == nil {
 		if db.Statement.Schema != nil && !db.Statement.Unscoped {
@@ -187,7 +187,7 @@ func CreateWithReturning(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func AfterCreate(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && (db.Statement.Schema.AfterSave || db.Statement.Schema.AfterCreate) {
 		callMethod(db, func(value interface{}, tx *gorm.DB) (called bool) {

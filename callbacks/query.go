@@ -11,6 +11,7 @@ import (
 	"gorm.io/gorm/schema"
 )
 
+// query 处理函数
 func Query(db *gorm.DB) {
 	if db.Error == nil {
 		if db.Statement.Schema != nil && !db.Statement.Unscoped {
@@ -24,18 +25,20 @@ func Query(db *gorm.DB) {
 		}
 
 		if !db.DryRun {
+			//查询
 			rows, err := db.Statement.ConnPool.QueryContext(db.Statement.Context, db.Statement.SQL.String(), db.Statement.Vars...)
 			if err != nil {
 				db.AddError(err)
 				return
 			}
 			defer rows.Close()
-
+			//读取解析
 			gorm.Scan(rows, db, false)
 		}
 	}
 }
 
+// 处理函数 构建 select 语句
 func BuildQuerySQL(db *gorm.DB) {
 	db.Statement.SQL.Grow(100)
 	clauseSelect := clause.Select{Distinct: db.Statement.Distinct}
@@ -136,6 +139,7 @@ func BuildQuerySQL(db *gorm.DB) {
 	db.Statement.Build("SELECT", "FROM", "WHERE", "GROUP BY", "ORDER BY", "LIMIT", "FOR")
 }
 
+//处理函数
 func Preload(db *gorm.DB) {
 	if db.Error == nil && len(db.Statement.Preloads) > 0 {
 		preloadMap := map[string][]string{}
@@ -182,7 +186,7 @@ func Preload(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func AfterQuery(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil && db.Statement.Schema.AfterFind {
 		callMethod(db, func(value interface{}, tx *gorm.DB) bool {

@@ -9,6 +9,7 @@ import (
 	"gorm.io/gorm/utils"
 )
 
+// 处理函数
 func SaveBeforeAssociations(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil {
 		selectColumns, restricted := SelectAndOmitColumns(db.Statement, true, false)
@@ -87,7 +88,7 @@ func SaveBeforeAssociations(db *gorm.DB) {
 		}
 	}
 }
-
+// 处理函数
 func SaveAfterAssociations(db *gorm.DB) {
 	if db.Error == nil && db.Statement.Schema != nil {
 		selectColumns, restricted := SelectAndOmitColumns(db.Statement, true, false)
