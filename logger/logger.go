@@ -9,7 +9,7 @@ import (
 	"gorm.io/gorm/utils"
 )
 
-// Colors
+// Colors 带颜色打印
 const (
 	Reset       = "\033[0m"
 	Red         = "\033[31m"
@@ -41,8 +41,8 @@ type Writer interface {
 
 type Config struct {
 	SlowThreshold time.Duration
-	Colorful      bool
-	LogLevel      LogLevel
+	Colorful      bool		//是否带颜色
+	LogLevel      LogLevel	//日志级别
 }
 
 // Interface logger interface
@@ -54,6 +54,7 @@ type Interface interface {
 	Trace(ctx context.Context, begin time.Time, fc func() (string, int64), err error)
 }
 
+//默认打印变量
 var Default = New(log.New(os.Stdout, "\r\n", log.LstdFlags), Config{
 	SlowThreshold: 100 * time.Millisecond,
 	LogLevel:      Warn,
@@ -92,6 +93,7 @@ func New(writer Writer, config Config) Interface {
 }
 
 type logger struct {
+	//内嵌一个接口, 一个结构体
 	Writer
 	Config
 	infoStr, warnStr, errStr            string
@@ -99,6 +101,7 @@ type logger struct {
 }
 
 // LogMode log mode
+// 拷贝一份
 func (l *logger) LogMode(level LogLevel) Interface {
 	newlogger := *l
 	newlogger.LogLevel = level

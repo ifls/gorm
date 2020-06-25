@@ -7,7 +7,7 @@ import (
 )
 
 type PreparedStmtDB struct {
-	Stmts map[string]*sql.Stmt
+	Stmts map[string]*sql.Stmt		//多个?
 	mux   sync.RWMutex
 	ConnPool
 }
@@ -15,6 +15,7 @@ type PreparedStmtDB struct {
 func (db *PreparedStmtDB) Close() {
 	db.mux.Lock()
 	for k, stmt := range db.Stmts {
+		//一条一条关闭
 		delete(db.Stmts, k)
 		stmt.Close()
 	}
@@ -37,12 +38,14 @@ func (db *PreparedStmtDB) prepare(query string) (*sql.Stmt, error) {
 		return stmt, nil
 	}
 
+	//预先准备一条语句
 	stmt, err := db.ConnPool.PrepareContext(context.Background(), query)
 	if err == nil {
 		db.Stmts[query] = stmt
 	}
 	db.mux.Unlock()
 
+	//透传返回
 	return stmt, err
 }
 

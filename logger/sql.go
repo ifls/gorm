@@ -22,6 +22,7 @@ func isPrintable(s []byte) bool {
 
 var convertableTypes = []reflect.Type{reflect.TypeOf(time.Time{}), reflect.TypeOf(false), reflect.TypeOf([]byte{})}
 
+// 输出最终的 sql 语句?
 func ExplainSQL(sql string, numericPlaceholder *regexp.Regexp, escaper string, avars ...interface{}) string {
 	var convertParams func(interface{}, int)
 	var vars = make([]interface{}, len(avars))

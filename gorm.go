@@ -36,7 +36,7 @@ type Config struct {
 	// ClauseBuilders clause builder
 	ClauseBuilders map[string]clause.ClauseBuilder
 	// ConnPool db conn pool
-	ConnPool ConnPool
+	ConnPool ConnPool		//可能就是 *sql.DB, 也可能是一个 struct 里面内嵌 *sql.DB
 	// Dialector database dialector
 	Dialector
 	// Plugins registered plugins
@@ -48,21 +48,22 @@ type Config struct {
 
 // DB GORM DB definition
 type DB struct {
-	*Config
+	*Config		//内嵌一个指针
 	Error        error
 	RowsAffected int64
 	Statement    *Statement
-	clone        int
+	clone        int		//只在 getInstance() 时可能发生拷贝一个 DB 的情况
 }
 
-// Session session config when create session with Session() method
+// Session session config when create session with db.Session() method
+// 这些字段 只在 db.Session() 函数里用到过
 type Session struct {
-	DryRun         bool
-	PrepareStmt    bool
-	WithConditions bool
+	DryRun         bool		//会话的配置
+	PrepareStmt    bool		//只在 db.Session 里面被调用过
+	WithConditions bool		// true 则db.clone = 2
 	Context        context.Context
 	Logger         logger.Interface
-	NowFunc        func() time.Time
+	NowFunc        func() time.Time		//用于拷贝给 db.Config
 }
 
 // Open initialize db session based on dialector
@@ -135,6 +136,7 @@ func Open(dialector Dialector, config *Config) (db *DB, err error) {
 }
 
 // Session create new db session
+// session 也就是一些配置
 func (db *DB) Session(config *Session) *DB {
 	var (
 		txConfig = *db.Config
@@ -190,8 +192,9 @@ func (db *DB) Debug() (tx *DB) {
 	})
 }
 
-// Set store value with key into current db instance's context
+// Set -> store value with key into current db instance's context
 func (db *DB) Set(key string, value interface{}) *DB {
+	//可能就是同一个对象
 	tx := db.getInstance()
 	tx.Statement.Settings.Store(key, value)
 	return tx
@@ -215,21 +218,25 @@ func (db *DB) InstanceGet(key string) (interface{}, bool) {
 }
 
 // Callback returns callback manager
+// 返回所有回调函数
 func (db *DB) Callback() *callbacks {
 	return db.callbacks
 }
 
 // AddError add error to db
+// 加错误, 返回最新的错误
 func (db *DB) AddError(err error) error {
 	if db.Error == nil {
 		db.Error = err
 	} else if err != nil {
+		//包装错误
 		db.Error = fmt.Errorf("%v; %w", db.Error, err)
 	}
 	return db.Error
 }
 
 // DB returns `*sql.DB`
+// 返回内部的连接池 一般是 *sql.DB 定义的原始通用接口
 func (db *DB) DB() (*sql.DB, error) {
 	connPool := db.ConnPool
 
@@ -244,6 +251,7 @@ func (db *DB) DB() (*sql.DB, error) {
 	return nil, errors.New("invalid db")
 }
 
+//
 func (db *DB) getInstance() *DB {
 	if db.clone > 0 {
 		tx := &DB{Config: db.Config}
@@ -272,6 +280,7 @@ func Expr(expr string, args ...interface{}) clause.Expr {
 	return clause.Expr{SQL: expr, Vars: args}
 }
 
+// 表连接
 func (db *DB) SetupJoinTable(model interface{}, field string, joinTable interface{}) error {
 	var (
 		tx                      = db.getInstance()
@@ -316,6 +325,7 @@ func (db *DB) SetupJoinTable(model interface{}, field string, joinTable interfac
 	return nil
 }
 
+//添加插件
 func (db *DB) Use(plugin Plugin) (err error) {
 	name := plugin.Name()
 	if _, ok := db.Plugins[name]; !ok {

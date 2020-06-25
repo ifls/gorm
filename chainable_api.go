@@ -1,3 +1,5 @@
+//链式 api  所有函数都返回 *DB
+
 package gorm
 
 import (
@@ -13,6 +15,7 @@ import (
 //    db.Model(&User{}).Update("name", "hello")
 //    // if user's primary key is non-blank, will use it as condition, then will only update the user's name to `hello`
 //    db.Model(&user).Update("name", "hello")
+// 指定了操作的对象和表,
 func (db *DB) Model(value interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Model = value
@@ -20,6 +23,7 @@ func (db *DB) Model(value interface{}) (tx *DB) {
 }
 
 // Clauses Add clauses
+// 添加子表达式
 func (db *DB) Clauses(conds ...clause.Expression) (tx *DB) {
 	tx = db.getInstance()
 	var whereConds []interface{}
@@ -41,6 +45,7 @@ func (db *DB) Clauses(conds ...clause.Expression) (tx *DB) {
 }
 
 // Table specify the table you would like to run db operations
+// 设置表名 到 Statement 结构体里
 func (db *DB) Table(name string) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.Table = name
@@ -48,6 +53,7 @@ func (db *DB) Table(name string) (tx *DB) {
 }
 
 // Distinct specify distinct fields that you want querying
+// 指定select 哪些字段 是 distinct
 func (db *DB) Distinct(args ...interface{}) (tx *DB) {
 	tx = db
 	if len(args) > 0 {
@@ -58,6 +64,7 @@ func (db *DB) Distinct(args ...interface{}) (tx *DB) {
 }
 
 // Select specify fields that you want when querying, creating, updating
+// 指定 需要操作的字段
 func (db *DB) Select(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 
@@ -109,6 +116,7 @@ func (db *DB) Select(query interface{}, args ...interface{}) (tx *DB) {
 }
 
 // Omit specify fields that you want to ignore when creating, updating and querying
+// 指定需要忽略的字段
 func (db *DB) Omit(columns ...string) (tx *DB) {
 	tx = db.getInstance()
 
@@ -121,6 +129,7 @@ func (db *DB) Omit(columns ...string) (tx *DB) {
 }
 
 // Where add conditions
+// 添加 过滤条件 加一个子句
 func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
@@ -130,6 +139,7 @@ func (db *DB) Where(query interface{}, args ...interface{}) (tx *DB) {
 }
 
 // Not add NOT conditions
+// 反向 过滤条件 加一个子句
 func (db *DB) Not(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
@@ -139,6 +149,7 @@ func (db *DB) Not(query interface{}, args ...interface{}) (tx *DB) {
 }
 
 // Or add OR conditions
+// 条件里的或 加一个子句
 func (db *DB) Or(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if conds := tx.Statement.BuildCondition(query, args...); len(conds) > 0 {
@@ -150,6 +161,7 @@ func (db *DB) Or(query interface{}, args ...interface{}) (tx *DB) {
 // Joins specify Joins conditions
 //     db.Joins("Account").Find(&user)
 //     db.Joins("JOIN emails ON emails.user_id = users.id AND emails.email = ?", "jinzhu@example.org").Find(&user)
+//
 func (db *DB) Joins(query string, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if tx.Statement.Joins == nil {
@@ -160,6 +172,7 @@ func (db *DB) Joins(query string, args ...interface{}) (tx *DB) {
 }
 
 // Group specify the group method on the find
+// select 时指定 group 子句
 func (db *DB) Group(name string) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.AddClause(clause.GroupBy{
@@ -169,6 +182,7 @@ func (db *DB) Group(name string) (tx *DB) {
 }
 
 // Having specify HAVING conditions for GROUP BY
+// 指定 group 的 having 子句
 func (db *DB) Having(query interface{}, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.AddClause(clause.GroupBy{
@@ -180,6 +194,7 @@ func (db *DB) Having(query interface{}, args ...interface{}) (tx *DB) {
 // Order specify order when retrieve records from database
 //     db.Order("name DESC")
 //     db.Order(gorm.Expr("name = ? DESC", "first")) // sql expression
+// 添加排序子句
 func (db *DB) Order(value interface{}) (tx *DB) {
 	tx = db.getInstance()
 
@@ -199,6 +214,7 @@ func (db *DB) Order(value interface{}) (tx *DB) {
 }
 
 // Limit specify the number of records to be retrieved
+// 限制行数 加一个子句
 func (db *DB) Limit(limit int) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.AddClause(clause.Limit{Limit: limit})
@@ -206,6 +222,7 @@ func (db *DB) Limit(limit int) (tx *DB) {
 }
 
 // Offset specify the number of records to skip before starting to return the records
+// 起始偏移 加个子句
 func (db *DB) Offset(offset int) (tx *DB) {
 	tx = db.getInstance()
 	tx.Statement.AddClause(clause.Limit{Offset: offset})
@@ -224,6 +241,7 @@ func (db *DB) Offset(offset int) (tx *DB) {
 //     }
 //
 //     db.Scopes(AmountGreaterThan1000, OrderStatus([]string{"paid", "shipped"})).Find(&orders)
+// 应用自定义函数
 func (db *DB) Scopes(funcs ...func(*DB) *DB) *DB {
 	for _, f := range funcs {
 		db = f(db)
@@ -233,6 +251,7 @@ func (db *DB) Scopes(funcs ...func(*DB) *DB) *DB {
 
 // Preload preload associations with given conditions
 //    db.Preload("Orders", "state NOT IN (?)", "cancelled").Find(&users)
+// 这是个啥
 func (db *DB) Preload(query string, args ...interface{}) (tx *DB) {
 	tx = db.getInstance()
 	if tx.Statement.Preloads == nil {
