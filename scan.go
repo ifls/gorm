@@ -169,6 +169,7 @@ func Scan(rows *sql.Rows, db *DB, initialized bool) {
 				}
 
 				db.RowsAffected++
+				//扫描一行
 				db.AddError(rows.Scan(values...))
 
 				for idx, column := range columns {

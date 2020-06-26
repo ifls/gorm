@@ -111,6 +111,7 @@ func (db *DB) Find(dest interface{}, conds ...interface{}) (tx *DB) {
 	if len(conds) > 0 {
 		tx.Statement.AddClause(clause.Where{Exprs: tx.Statement.BuildCondition(conds[0], conds[1:]...)})
 	}
+	// 没有设置 RaiseErrorOnNotFound 所以没报 recordnotfound错误
 	tx.Statement.Dest = dest
 	tx.callbacks.Query().Execute(tx)
 	return
