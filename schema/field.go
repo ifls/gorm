@@ -65,6 +65,7 @@ type Field struct {
 	Set                   func(reflect.Value, interface{}) error
 }
 
+// 解析结构体标记
 func (schema *Schema) ParseField(fieldStruct reflect.StructField) *Field {
 	field := &Field{
 		Name:              fieldStruct.Name,
