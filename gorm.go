@@ -105,6 +105,7 @@ func Open(dialector Dialector, config *Config) (db *DB, err error) {
 	}
 
 	if config.Dialector != nil {
+		// 数据库方言,
 		err = config.Dialector.Initialize(db)
 	}
 
