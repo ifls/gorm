@@ -32,7 +32,8 @@ func Query(db *gorm.DB) {
 				return
 			}
 			defer rows.Close()
-			//读取解析
+
+			//扫描
 			gorm.Scan(rows, db, false)
 		}
 	}
