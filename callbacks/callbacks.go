@@ -28,7 +28,7 @@ func RegisterDefaultCallbacks(db *gorm.DB, config *Config) {
 	//select
 	queryCallback := db.Callback().Query()
 	queryCallback.Register("gorm:query", Query)
-	queryCallback.Register("gorm:preload", Preload)
+	queryCallback.Register("gorm:preload", Preload) //预加载后续数据
 	queryCallback.Register("gorm:after_query", AfterQuery)
 
 	//delete

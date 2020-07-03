@@ -25,6 +25,7 @@ type ViewOption struct {
 	Query       *DB
 }
 
+// db 的 api
 type Migrator interface {
 	// AutoMigrate
 	AutoMigrate(dst ...interface{}) error

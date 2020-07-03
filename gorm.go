@@ -17,26 +17,26 @@ import (
 type Config struct {
 	// GORM perform single create, update, delete operations in transactions by default to ensure database data integrity
 	// You can disable it by setting `SkipDefaultTransaction` to true
-	SkipDefaultTransaction bool
+	SkipDefaultTransaction bool //禁用每条更新语句都开一个事务, 读语句不许开事务
 	// NamingStrategy tables, columns naming strategy
-	NamingStrategy schema.Namer
+	NamingStrategy schema.Namer //命名策略
 	// Logger
 	Logger logger.Interface
 	// NowFunc the function to be used when creating a new timestamp
 	NowFunc func() time.Time
 	// DryRun generate sql without execute
-	DryRun bool
+	DryRun bool //预检
 	// PrepareStmt executes the given query in cached statement
-	PrepareStmt bool
+	PrepareStmt bool //使用预处理语句执行
 	// DisableAutomaticPing
-	DisableAutomaticPing bool
+	DisableAutomaticPing bool // 不自动 ping
 	// DisableForeignKeyConstraintWhenMigrating
 	DisableForeignKeyConstraintWhenMigrating bool
 
 	// ClauseBuilders clause builder
-	ClauseBuilders map[string]clause.ClauseBuilder
+	ClauseBuilders map[string]clause.ClauseBuilder //子句构建器
 	// ConnPool db conn pool
-	ConnPool ConnPool		//可能就是 *sql.DB, 也可能是一个 struct 里面内嵌 *sql.DB
+	ConnPool ConnPool //可能就是 *sql.DB, 也可能是一个 struct 里面内嵌 *sql.DB
 	// Dialector database dialector
 	Dialector
 	// Plugins registered plugins
@@ -48,22 +48,22 @@ type Config struct {
 
 // DB GORM DB definition
 type DB struct {
-	*Config		//内嵌一个指针
+	*Config      //内嵌一个指针
 	Error        error
 	RowsAffected int64
-	Statement    *Statement
-	clone        int		//只在 getInstance() 时可能发生拷贝一个 DB 的情况
+	Statement    *Statement //sql 相关数据状态
+	clone        int        //只在 getInstance() 时可能发生拷贝一个 DB 的情况
 }
 
 // Session session config when create session with db.Session() method
 // 这些字段 只在 db.Session() 函数里用到过
 type Session struct {
-	DryRun         bool		//会话的配置
-	PrepareStmt    bool		//只在 db.Session 里面被调用过
-	WithConditions bool		// true 则db.clone = 2
+	DryRun         bool //会话的配置
+	PrepareStmt    bool //只在 db.Session 里面被调用过
+	WithConditions bool // true 则db.clone = 2
 	Context        context.Context
 	Logger         logger.Interface
-	NowFunc        func() time.Time		//用于拷贝给 db.Config
+	NowFunc        func() time.Time //用于拷贝给 db.Config
 }
 
 // Open initialize db session based on dialector
@@ -105,7 +105,7 @@ func Open(dialector Dialector, config *Config) (db *DB, err error) {
 	}
 
 	if config.Dialector != nil {
-		// 数据库方言,
+		// 数据库方言,  真正初始化处理函数链
 		err = config.Dialector.Initialize(db)
 	}
 

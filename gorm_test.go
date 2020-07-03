@@ -47,7 +47,7 @@ var (
 
 func init() {
 	rand.Seed(time.Now().UnixNano())
-	dsn := "root:Wfs123456@(localhost)/simple?charset=utf8&parseTime=True&loc=Local"
+	dsn := "root@(localhost)/simple?charset=utf8&parseTime=True&loc=Local"
 	var err error
 	db, err = gorm.Open(mysql.Open(dsn), &gorm.Config{})
 	if err != nil {
